@@ -64,10 +64,6 @@ def client_listen():
     logger.info("Starting client listener")
     while True:
         try:
-            check_play()
-        except:
-            print(traceback.format_exc(1))
-        try:
             for dweep in dweepy.listen_for_dweets_from('sgsmcpi'):
                 logger.info("Dweep received:\n{}".format(dweep))
                 for key in dweep["content"]:
@@ -86,7 +82,11 @@ def listen():
     logger.info("Starting listener")
     while True:
         try:
-            for dweep in dweepy.listen_for_dweets_from('sgsmcpi'):
+            check_play()
+        except:
+            print(traceback.format_exc(1))
+        try:
+            for dweep in dweepy.listen_for_dweets_from('sgsmcpi', 15):
                 logger.info("Dweep received:\n{}".format(dweep))
                 for key in dweep["content"].keys():
                     logger.info("Processing key {}".format(key))
@@ -204,5 +204,6 @@ if args.client=="true":
     client_listen()
 else:
     print('listen()')
+    listen()
 
 
