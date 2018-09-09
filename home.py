@@ -83,7 +83,9 @@ def listen():
     while True:
         try:
             if counter > 0:
-                check_play()
+                if check_play() == False:
+                    counter -= 1
+                    play_random()
         except:
             print(traceback.format_exc(1))
         try:
@@ -197,9 +199,7 @@ def check_play():
         if 'mpg123' in line:
             found = True
 
-    if found is False:
-        counter -= 1
-        play_random()
+    return found
 
 
 
