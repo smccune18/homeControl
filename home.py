@@ -100,6 +100,9 @@ def listen():
                     elif key == "play":
                         counter = 8
                         play_random()
+                    elif key == "stop_play":
+                        counter = 0
+                        kill_mp3()
                     elif key == "wake_pc":
                         logger.info("Running wake_pc")
                         wake_pc(maclist['spc'])
