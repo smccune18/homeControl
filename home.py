@@ -27,8 +27,6 @@ fh.setFormatter(formatter)
 logger.addHandler(ch)
 rc = None
 logger.addHandler(fh)
-global counter
-counter = 0
 maclist = {
 "Minolispc":"30:9C:23:0D:E4:80",
 "pi":"B8:27:EB:BC:6F:21",
@@ -76,6 +74,7 @@ def client_listen():
 def listen():
     logger.info("Time to get the IPs for the different devices")
     ipscan()
+    counter = 0
     try:
         rc = panasonic_viera.RemoteControl(iplist["bedtv"])
     except:
@@ -83,7 +82,8 @@ def listen():
     logger.info("Starting listener")
     while True:
         try:
-            check_play()
+            if counter > 0:
+                check_play()
         except:
             print(traceback.format_exc(1))
         try:
@@ -98,7 +98,8 @@ def listen():
                     elif key == "volume_down":
                         volume_down()
                     elif key == "play":
-                        play_random(8)
+                        counter = 8
+                        play_random()
                     elif key == "wake_pc":
                         logger.info("Running wake_pc")
                         wake_pc(maclist['spc'])
@@ -185,19 +186,17 @@ def kill_mp3():
             pid = int(line.split(None, 1)[0])
             os.kill(pid, signal.SIGKILL)
 
-
 def check_play():
-    if counter > 0:
-        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
-        out, err = p.communicate()
-        found = False
-        for line in out.splitlines():
-            if 'mpg123' in line:
-                found = True
+    p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    found = False
+    for line in out.splitlines():
+        if 'mpg123' in line:
+            found = True
 
-        if found is False:
-            counter -= 1
-            play_random()
+    if found is False:
+        counter -= 1
+        play_random()
 
 
 
