@@ -7,7 +7,9 @@ import panasonic_viera
 import logging
 import socket
 import subprocess
+import random
 import argparse
+import signal
 
 logger = logging.getLogger('Home')
 logger.setLevel(logging.DEBUG)
@@ -25,7 +27,7 @@ fh.setFormatter(formatter)
 logger.addHandler(ch)
 rc = None
 logger.addHandler(fh)
-
+counter = 0
 maclist = {
 "Minolispc":"30:9C:23:0D:E4:80",
 "pi":"B8:27:EB:BC:6F:21",
@@ -40,7 +42,7 @@ maclist = {
 
 hostlist = {
 "mpc":"DESKTOP-CS182H9",
-"pi":"raspberrypi",
+"pi":"piAlarm",
 "galaxy":"Samsung(android)",
 "spc":"StephenGamePC",
 "Anubis":"Anubis",
@@ -61,6 +63,10 @@ logger.info("Running on host {} with ip {}".format(socket.gethostname(), myip))
 def client_listen():
     logger.info("Starting client listener")
     while True:
+        try:
+            check_play()
+        except:
+            print(traceback.format_exc(1))
         try:
             for dweep in dweepy.listen_for_dweets_from('sgsmcpi'):
                 logger.info("Dweep received:\n{}".format(dweep))
@@ -88,6 +94,10 @@ def listen():
                         volume_up()
                     elif key == "volume_down":
                         volume_down()
+                    elif key == "volume_down":
+                        volume_down()
+                    elif key == "play":
+                        play_random(8)
                     elif key == "wake_pc":
                         logger.info("Running wake_pc")
                         wake_pc(maclist['spc'])
@@ -145,6 +155,49 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--client', default="false" )
 args = parser.parse_args()
 print (args.client)
+
+
+
+
+lovelineMp3s = []
+for dir, subdirs, files in os.walk('/home/pi/Music/LoveLine'):
+    for file in files:
+        lovelineMp3s.append(dir + '/' + file)
+
+subp = None
+
+for line in lovelineMp3s:
+    print line
+
+
+def play_random():
+    file = lovelineMp3s[random.randint(0, len(lovelineMp3s))]
+    print( 'Playing Loveline file: ' +file)
+    subp = subprocess.Popen(['mpg123', '-q', file])
+
+def kill_mp3():
+    counter = 0
+    p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    for line in out.splitlines():
+        if 'mpg123' in line:
+            pid = int(line.split(None, 1)[0])
+            os.kill(pid, signal.SIGKILL)
+
+
+def check_play():
+    if counter > 0:
+        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+        out, err = p.communicate()
+        found = False
+        for line in out.splitlines():
+            if 'mpg123' in line:
+                found = True
+
+        if found is False:
+            counter -= 1
+            play_random()
+
 
 
 if args.client=="true":
