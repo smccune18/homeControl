@@ -89,7 +89,7 @@ def listen():
         except:
             print(traceback.format_exc(1))
         try:
-            for dweep in dweepy.listen_for_dweets_from('sgsmcpi', 15):
+            for dweep in dweepy.listen_for_dweets_from('sgsmcpi', 60):
                 logger.info("Dweep received:\n{}".format(dweep))
                 for key in dweep["content"].keys():
                     logger.info("Processing key {}".format(key))
