@@ -27,6 +27,7 @@ fh.setFormatter(formatter)
 logger.addHandler(ch)
 rc = None
 logger.addHandler(fh)
+global counter
 counter = 0
 maclist = {
 "Minolispc":"30:9C:23:0D:E4:80",
